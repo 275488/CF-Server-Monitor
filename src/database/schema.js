@@ -701,12 +701,6 @@ export async function cleanupOldData(db, enableLongRetention = false, force = fa
       phases: []
     };
     
-    // 删除旧格式数据
-    const strDeleteResult = await db.prepare(
-      `DELETE FROM metrics_history WHERE typeof(timestamp) = 'text'`
-    ).run();
-    stats.oldFormat = strDeleteResult.meta.changes || 0;
-    
     // 当 enableLongRetention 为 true 时才执行聚合
     if (enableLongRetention) {
       for (const phase of AGGREGATE_PHASES) {
