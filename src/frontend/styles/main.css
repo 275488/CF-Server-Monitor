@@ -1376,6 +1376,10 @@ body::before {
     color: var(--text-muted);
 }
 
+.secret-input-masked {
+    -webkit-text-security: disc;
+}
+
 .form-textarea {
     resize: vertical;
     min-height: 80px;

@@ -310,7 +310,7 @@
                   <div class="form-group flex-1">
                     <label class="form-label">{{ trans.telegramToken }}</label>
                     <div class="password-input-wrapper">
-                      <input :type="passwordVisible.tgBotToken ? 'text' : 'password'" name="tg_bot_token" v-model="settings.tg_bot_token" class="form-input" placeholder="Bot Token or Webhook URL">
+                      <input type="text" name="tg_bot_token" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" v-model="settings.tg_bot_token" :class="['form-input', { 'secret-input-masked': !passwordVisible.tgBotToken }]" placeholder="Bot Token or Webhook URL">
                       <button type="button" class="password-toggle" @click="togglePassword('tgBotToken')">
                         {{ passwordVisible.tgBotToken ? '🙈' : '👁️' }}
                       </button>
@@ -320,7 +320,7 @@
                   <div class="form-group flex-1">
                     <label class="form-label">{{ trans.chatId }}</label>
                     <div class="password-input-wrapper">
-                      <input :type="passwordVisible.tgChatId ? 'text' : 'password'" name="tg_chat_id" autocomplete="off" v-model="settings.tg_chat_id" class="form-input" placeholder="Optional Chat ID">
+                      <input type="text" name="tg_chat_id" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" v-model="settings.tg_chat_id" :class="['form-input', { 'secret-input-masked': !passwordVisible.tgChatId }]" placeholder="Optional Chat ID">
                       <button type="button" class="password-toggle" @click="togglePassword('tgChatId')">
                         {{ passwordVisible.tgChatId ? '🙈' : '👁️' }}
                       </button>
@@ -366,7 +366,7 @@
                 <div class="form-group flex-1">
                   <label class="form-label">{{ trans.turnstileSecretKey }}</label>
                   <div class="password-input-wrapper">
-                    <input :type="passwordVisible.turnstileSecret ? 'text' : 'password'" name="turnstile_secret_key" autocomplete="off" v-model="settings.turnstile_secret_key" class="form-input" :placeholder="trans.turnstileSecretKeyPlaceholder">
+                    <input type="text" name="turnstile_secret_key" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" v-model="settings.turnstile_secret_key" :class="['form-input', { 'secret-input-masked': !passwordVisible.turnstileSecret }]" :placeholder="trans.turnstileSecretKeyPlaceholder">
                     <button type="button" class="password-toggle" @click="togglePassword('turnstileSecret')">
                       {{ passwordVisible.turnstileSecret ? '🙈' : '👁️' }}
                     </button>
@@ -382,7 +382,7 @@
               <div class="form-group mt-4">
                 <label class="form-label">{{ trans.jwtSecret }}</label>
                 <div class="password-input-wrapper">
-                  <input :type="passwordVisible.jwtSecret ? 'text' : 'password'" name="jwt_secret" autocomplete="off" v-model="settings.jwt_secret" class="form-input" :placeholder="trans.jwtSecretPlaceholder">
+                  <input type="text" name="jwt_secret" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" v-model="settings.jwt_secret" :class="['form-input', { 'secret-input-masked': !passwordVisible.jwtSecret }]" :placeholder="trans.jwtSecretPlaceholder">
                   <button type="button" class="password-toggle" @click="togglePassword('jwtSecret')">
                     {{ passwordVisible.jwtSecret ? '🙈' : '👁️' }}
                   </button>
@@ -407,7 +407,7 @@
                 <div class="form-group flex-1">
                   <label class="form-label">Cloudflare API Token</label>
                   <div class="password-input-wrapper">
-                    <input :type="passwordVisible.cloudflareToken ? 'text' : 'password'" name="cloudflare_token" autocomplete="off" v-model="settings.cloudflare_token" class="form-input" :placeholder="trans.cloudflareTokenPlaceholder">
+                    <input type="text" name="cloudflare_token" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" v-model="settings.cloudflare_token" :class="['form-input', { 'secret-input-masked': !passwordVisible.cloudflareToken }]" :placeholder="trans.cloudflareTokenPlaceholder">
                     <button type="button" class="password-toggle" @click="togglePassword('cloudflareToken')">
                       {{ passwordVisible.cloudflareToken ? '🙈' : '👁️' }}
                     </button>
@@ -434,14 +434,40 @@
 
               <div class="form-group">
                 <label class="form-label">{{ trans.username }}</label>
-                <input type="text" name="admin_username" autocomplete="username" v-model="settings.username" class="form-input" :placeholder="trans.usernamePlaceholder">
+                <input
+                  type="text"
+                  name="settings_admin_user"
+                  autocomplete="off"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  data-form-type="other"
+                  v-model="settings.username"
+                  class="form-input"
+                  :placeholder="trans.usernamePlaceholder"
+                >
               </div>
 
-              <div class="form-row">
+              <button type="button" class="btn btn-sm mb-3" @click="toggleAdminPasswordChange">
+                {{ changeAdminPassword ? trans.cancelPasswordChange : trans.changePassword }}
+              </button>
+
+              <div v-if="changeAdminPassword" class="form-row">
                 <div class="form-group flex-1">
                   <label class="form-label">{{ trans.password }}</label>
                   <div class="password-input-wrapper">
-                    <input :type="passwordVisible.password ? 'text' : 'password'" name="admin_password" autocomplete="new-password" v-model="settings.password" class="form-input" placeholder="••••••••">
+                    <input
+                      :type="passwordVisible.password ? 'text' : 'password'"
+                      name="settings_admin_passphrase"
+                      autocomplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-bwignore="true"
+                      data-form-type="other"
+                      v-model="settings.password"
+                      class="form-input"
+                      placeholder="••••••••"
+                    >
                     <button type="button" class="password-toggle" @click="togglePassword('password')">
                       {{ passwordVisible.password ? '🙈' : '👁️' }}
                     </button>
@@ -451,7 +477,18 @@
                 <div class="form-group flex-1">
                   <label class="form-label">{{ trans.confirmPassword }}</label>
                   <div class="password-input-wrapper">
-                    <input :type="passwordVisible.confirmPassword ? 'text' : 'password'" name="admin_confirm_password" autocomplete="new-password" v-model="settings.confirm_password" class="form-input" placeholder="••••••••">
+                    <input
+                      :type="passwordVisible.confirmPassword ? 'text' : 'password'"
+                      name="settings_admin_passphrase_confirm"
+                      autocomplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-bwignore="true"
+                      data-form-type="other"
+                      v-model="settings.confirm_password"
+                      class="form-input"
+                      placeholder="••••••••"
+                    >
                     <button type="button" class="password-toggle" @click="togglePassword('confirmPassword')">
                       {{ passwordVisible.confirmPassword ? '🙈' : '👁️' }}
                     </button>
@@ -1136,6 +1173,19 @@ const settings = ref({
   custom_bd: ''
 })
 const apiSecret = ref('')
+const changeAdminPassword = ref(false)
+
+const clearAdminPasswordInputs = () => {
+  settings.value.password = ''
+  settings.value.confirm_password = ''
+}
+
+const toggleAdminPasswordChange = () => {
+  changeAdminPassword.value = !changeAdminPassword.value
+  if (!changeAdminPassword.value) {
+    clearAdminPasswordInputs()
+  }
+}
 
 const { visibility: passwordVisible, toggle: togglePassword } = usePasswordVisibility([
   'login', 'tgBotToken', 'tgChatId', 'turnstileSecret', 'cloudflareToken', 'jwtSecret', 'password', 'confirmPassword'
@@ -1155,7 +1205,7 @@ const editForm = ref({
   reset_day: 1,
   collect_interval: 0,
   report_interval: 60,
-  ping_mode: 'http',
+  ping_mode: 'tcp',
   custom_ct: '',
   custom_cu: '',
   custom_cm: '',
@@ -1456,11 +1506,13 @@ const loadSettings = async () => {
         jwt_secret: '',
         username: settingsData.username || '',
         password: '',  // 不显示加密后的密码
+        confirm_password: '',
         custom_ct: settingsData.custom_ct || '',
         custom_cu: settingsData.custom_cu || '',
         custom_cm: settingsData.custom_cm || '',
         custom_bd: settingsData.custom_bd || ''
       }
+      changeAdminPassword.value = false
       apiSecret.value = data.api_secret || ''
     }
   } catch (e) {
@@ -1487,8 +1539,13 @@ const saveSettings = async () => {
       return
     }
 
-    // 只有当用户输入了新密码时才验证密码确认
-    if (settings.value.password && settings.value.password.length > 0) {
+    const shouldChangePassword = changeAdminPassword.value && (
+      settings.value.password.length > 0 ||
+      settings.value.confirm_password.length > 0
+    )
+
+    // 只有当用户显式输入了新密码时才验证密码确认
+    if (shouldChangePassword) {
       if (settings.value.password !== settings.value.confirm_password) {
         validationError.value = trans.value.passwordMismatch
         return
@@ -1551,7 +1608,7 @@ const saveSettings = async () => {
     }
 
     // 只有当用户输入了新密码时才保存密码
-    if (settings.value.password && settings.value.password.length > 0) {
+    if (shouldChangePassword && settings.value.password.length > 0) {
       data.settings.password = settings.value.password
     }
 
@@ -1564,8 +1621,8 @@ const saveSettings = async () => {
       const result = await adminApiForSite(data)
       if (!result.error) {
         saveResult.value = { success: true }
-        settings.value.password = ''
-        settings.value.confirm_password = ''
+        clearAdminPasswordInputs()
+        changeAdminPassword.value = false
         settings.value.jwt_secret = ''
         loadSettings()
       } else {
