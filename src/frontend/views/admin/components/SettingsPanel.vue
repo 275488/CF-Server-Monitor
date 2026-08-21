@@ -217,6 +217,38 @@
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label class="form-label">
+              {{ trans.notificationTimezone || 'Notification Timezone' }}
+              <HelpTooltip :text="trans.notificationTimezoneTip || 'Used only for notification output times and expiration reminder schedule.'" />
+            </label>
+            <input
+              type="text"
+              list="notification-timezone-options"
+              v-model.trim="settings.notification_timezone"
+              class="form-input"
+              placeholder="UTC"
+            >
+            <datalist id="notification-timezone-options">
+              <option v-for="timezone in commonNotificationTimezones" :key="timezone" :value="timezone"></option>
+            </datalist>
+          </div>
+
+          <div class="form-group flex-1">
+            <label class="form-label">
+              {{ trans.expireNotificationTime || 'Expiration Notification Time' }}
+              <HelpTooltip :text="trans.expireNotificationTimeTip || 'Expiration reminders are checked by the hourly cron at this hour in the notification timezone.'" />
+            </label>
+            <input
+              type="time"
+              v-model="settings.expire_notification_time"
+              class="form-input"
+              step="3600"
+            >
+          </div>
+        </div>
+
         <div v-if="notificationChannel === 'builtin'" class="form-row">
           <div class="form-group flex-1">
             <label class="form-label">{{ trans.telegramToken }}</label>
@@ -640,6 +672,18 @@ defineEmits([
   'save-settings', 'upload-bg', 'upload-favicon',
   'send-test-notification', 'query-d1-usage'
 ])
+
+const commonNotificationTimezones = [
+  'UTC',
+  'Asia/Shanghai',
+  'Asia/Hong_Kong',
+  'Asia/Tokyo',
+  'Asia/Singapore',
+  'Europe/London',
+  'Europe/Berlin',
+  'America/New_York',
+  'America/Los_Angeles'
+]
 
 const cspErrors = reactive({
   csp_static: '',

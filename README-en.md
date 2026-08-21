@@ -335,14 +335,14 @@ Available template variables:
 | `{{client}}` / `{{clients}}` | Server names in this notification, joined by comma for multiple servers |
 | `{{count}}` | Number of affected servers; not shown by the default template, but available for custom templates |
 | `{{message}}` | Detailed notification list |
-| `{{time}}` | UTC send time |
+| `{{time}}` | Send time formatted in the notification timezone |
 | `{{notification}}` | Full content after applying the notification template, usually used as Webhook `content` |
 | `{{title}}` | Fixed title `💌 Cloudflare Server Monitor` |
 
 Supported alert types:
 
 - Offline alert: notify after a node stays offline for the configured delay; send recovery notice when it returns.
-- Expiration reminder: notify daily 1 to 7 days before expiration, or disable it.
+- Expiration reminder: notify daily 1 to 7 days before expiration at the configured notification timezone and expiration notification time, or disable it.
 - Resource alert: define rules for CPU, memory, disk, inbound/outbound network speed, and similar metrics.
 
 Send a test notification before saving.
@@ -458,8 +458,8 @@ After upgrading from older versions to versions with GPU, disk IO, packet loss, 
 
 | Cron | Description |
 | --- | --- |
-| `*/1 * * * *` | Detect offline nodes and send alerts every minute |
-| `0 * * * *` | Run hourly combined tasks, including monthly table rotation, old table cleanup, and expiration checks |
+| `*/1 * * * *` | Detect offline nodes/resource alerts every minute |
+| `0 * * * *` | Run hourly combined tasks, including monthly table rotation, old table cleanup, and expiration checks at the configured notification timezone/hour |
 
 ## Local Development
 

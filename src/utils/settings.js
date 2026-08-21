@@ -2,7 +2,7 @@ const CURRENT_VERSION = '2.8.4 Beta7';
 export const DEFAULT_SITE_TITLE = 'Cloudflare Server Monitor';
 export const APPEARANCE_FIELDS = ['site_title', 'custom_bg', 'favicon', 'custom_head', 'custom_script', 'csp_static', 'csp_api', 'display_mode', 'theme_options'];
 
-export const SITE_FIELDS = ['is_public', 'show_price', 'show_expire', 'show_tf', 'show_three_net_details', 'wss_report_enabled', 'wss_report_hours', 'frontend_ws_timeout_minutes', 'long_history_points', 'tg_notify', 'tg_bot_token', 'tg_chat_id', 'notification_webhook_enabled', 'notification_webhook_url', 'notification_webhook_method', 'notification_webhook_format', 'notification_webhook_headers', 'notification_webhook_body', 'notification_template', 'turnstile_enabled', 'turnstile_login_enabled', 'turnstile_site_key', 'turnstile_secret_key', 'jwt_secret', 'username', 'password', 'cloudflare_account_id', 'cloudflare_token', 'custom_ct', 'custom_cu', 'custom_cm', 'custom_bd', 'expire_reminder', 'resource_alert_rules', 'theme_url', 'history_id_optimized','servers_optimized'];
+export const SITE_FIELDS = ['is_public', 'show_price', 'show_expire', 'show_tf', 'show_three_net_details', 'wss_report_enabled', 'wss_report_hours', 'frontend_ws_timeout_minutes', 'long_history_points', 'tg_notify', 'tg_bot_token', 'tg_chat_id', 'notification_timezone', 'expire_notification_time', 'notification_webhook_enabled', 'notification_webhook_url', 'notification_webhook_method', 'notification_webhook_format', 'notification_webhook_headers', 'notification_webhook_body', 'notification_template', 'turnstile_enabled', 'turnstile_login_enabled', 'turnstile_site_key', 'turnstile_secret_key', 'jwt_secret', 'username', 'password', 'cloudflare_account_id', 'cloudflare_token', 'custom_ct', 'custom_cu', 'custom_cm', 'custom_bd', 'expire_reminder', 'resource_alert_rules', 'theme_url', 'history_id_optimized','servers_optimized'];
 
 const SITE_SETTINGS_TTL = 120 * 1000;
 const JWT_SECRET_MIN_LENGTH = 32;
@@ -13,6 +13,8 @@ export const EXPIRE_REMINDER_DAYS_MAX = 7;
 export const LONG_HISTORY_POINT_OPTIONS = [60, 120, 180, 240];
 export const DEFAULT_LONG_HISTORY_POINTS = 120;
 export const FRONTEND_WS_TIMEOUT_MINUTES_MAX = 1440;
+export const DEFAULT_NOTIFICATION_TIMEZONE = 'UTC';
+export const DEFAULT_EXPIRE_NOTIFICATION_TIME = '12:00';
 export const ALL_WSS_REPORT_HOURS = Object.freeze(Array.from({ length: 24 }, (_, hour) => hour));
 export const RESOURCE_ALERT_WINDOW_MIN = 5;
 export const RESOURCE_ALERT_WINDOW_MAX = 10;
@@ -75,6 +77,8 @@ const defaults = {
   tg_notify: '0',
   tg_bot_token: '',
   tg_chat_id: '',
+  notification_timezone: DEFAULT_NOTIFICATION_TIMEZONE,
+  expire_notification_time: DEFAULT_EXPIRE_NOTIFICATION_TIME,
   notification_webhook_enabled: 'false',
   notification_webhook_url: '',
   notification_webhook_method: 'POST',
@@ -167,6 +171,24 @@ export function normalizeExpireReminder(value) {
 
 export function getExpireReminderDays(value) {
   return Number(normalizeExpireReminder(value));
+}
+
+export function normalizeNotificationTimezone(value) {
+  const timezone = String(value || '').trim();
+  if (!timezone || timezone.length > 64) return DEFAULT_NOTIFICATION_TIMEZONE;
+
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format(new Date(0));
+    return timezone;
+  } catch (_) {
+    return DEFAULT_NOTIFICATION_TIMEZONE;
+  }
+}
+
+export function normalizeExpireNotificationTime(value) {
+  const time = String(value || '').trim();
+  const match = time.match(/^([01]\d|2[0-3])(?::[0-5]\d)?$/);
+  return match ? `${match[1]}:00` : DEFAULT_EXPIRE_NOTIFICATION_TIME;
 }
 
 export function normalizeNotificationWebhookMethod(value) {
@@ -599,6 +621,8 @@ export async function loadSiteSettings(db, options = {}) {
     result.notification_webhook_headers = normalizeNotificationWebhookHeaders(result.notification_webhook_headers);
     result.notification_webhook_body = normalizeNotificationWebhookBody(result.notification_webhook_body);
     result.notification_template = normalizeNotificationTemplate(result.notification_template);
+    result.notification_timezone = normalizeNotificationTimezone(result.notification_timezone);
+    result.expire_notification_time = normalizeExpireNotificationTime(result.expire_notification_time);
   } catch (e) {
     console.error('加载站点设置失败:', e);
   }
@@ -693,6 +717,8 @@ export async function saveSiteOptions(db, updates) {
   siteOptions.notification_webhook_headers = normalizeNotificationWebhookHeaders(siteOptions.notification_webhook_headers);
   siteOptions.notification_webhook_body = normalizeNotificationWebhookBody(siteOptions.notification_webhook_body);
   siteOptions.notification_template = normalizeNotificationTemplate(siteOptions.notification_template);
+  siteOptions.notification_timezone = normalizeNotificationTimezone(siteOptions.notification_timezone);
+  siteOptions.expire_notification_time = normalizeExpireNotificationTime(siteOptions.expire_notification_time);
   
   await db.prepare(
     'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value'
