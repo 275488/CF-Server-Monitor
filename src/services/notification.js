@@ -74,8 +74,7 @@ function formatLastReportTime(timestamp, settings = {}) {
 function isExpireNotificationTimeDue(settings = {}, timestamp = Date.now()) {
   const parts = getZonedDateParts(timestamp, settings.notification_timezone);
   if (!parts) return false;
-  const [hour] = normalizeExpireNotificationTime(settings.expire_notification_time).split(':');
-  return parts.hour === hour;
+  return Number(parts.hour) === Number(normalizeExpireNotificationTime(settings.expire_notification_time));
 }
 
 function getZonedDateSerial(timestamp, timezone) {

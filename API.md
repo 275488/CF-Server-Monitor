@@ -1251,7 +1251,7 @@ Header：`X-Turnstile-Token: <token>`（当 `site_options.turnstile_enabled` 或
     "tg_bot_token": "",
     "tg_chat_id": "",
     "notification_timezone": "UTC",
-    "expire_notification_time": "12:00",
+    "expire_notification_time": "12",
     "turnstile_enabled": "false",
     "turnstile_login_enabled": "false",
     "turnstile_site_key": "",
@@ -1284,7 +1284,7 @@ Header：`X-Turnstile-Token: <token>`（当 `site_options.turnstile_enabled` 或
 - Turnstile：本次请求把 `turnstile_enabled` 或 `turnstile_login_enabled` 设为 `true` 时，必须同时提供非空 `turnstile_site_key` 与 `turnstile_secret_key`
 - 通知：规范化后的 `tg_notify` 非 `0`，或 `expire_reminder` 为 `1`-`7` 时，必须提供非空 `tg_bot_token`
 - `notification_timezone`：通知输出时间和到期提醒计划使用的 IANA 时区；缺失或非法值回退为 `UTC`
-- `expire_notification_time`：到期提醒每天在通知时区内执行的整点小时，格式 `HH:00`；缺失或非法值回退为 `12:00`
+- `expire_notification_time`：到期提醒每天在通知时区内执行的小时，取值 `0`-`23`；缺失或非法值回退为 `12`
 - `appearance_options` / `theme_options`：必须是非数组对象；`display_mode` 规范为 `bar` / `ring` / `table`
 - `frontend_ws_timeout_minutes`：规范为 `0`-`1440` 的整数分钟；缺失或非法值回退为 `0`，即前端连接不超时
 - `csp_static` / `csp_api`：逗号分隔，只保留不带凭据、路径、查询或 fragment 的 HTTPS origin，非法项会被静默过滤
@@ -1778,7 +1778,7 @@ UUID 缺失或格式非法时返回 `400 { "error": "invalidServerId", "code": 4
   custom_bd: string,             // BGP host[:port]
   expire_reminder: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7',
   notification_timezone: string, // IANA timezone；默认 UTC
-  expire_notification_time: string, // HH:00；默认 12:00
+  expire_notification_time: string, // '0'-'23'；默认 12
   history_id_optimized: 'true' | 'false',
   servers_optimized: 'true' | 'false'
 }

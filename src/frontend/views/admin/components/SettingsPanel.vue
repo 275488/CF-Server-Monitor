@@ -238,14 +238,11 @@
           <div class="form-group flex-1">
             <label class="form-label">
               {{ trans.expireNotificationTime || 'Expiration Notification Time' }}
-              <HelpTooltip :text="trans.expireNotificationTimeTip || 'Expiration reminders are checked by the hourly cron at this hour in the notification timezone.'" />
+              <HelpTooltip :text="trans.expireNotificationTimeTip || 'Check expiration and send reminders daily at this hour in the notification timezone. Use 0-23.'" />
             </label>
-            <input
-              type="time"
-              v-model="settings.expire_notification_time"
-              class="form-input"
-              step="3600"
-            >
+            <select v-model="settings.expire_notification_time" class="form-select">
+              <option v-for="hour in expireNotificationHourOptions" :key="hour" :value="hour">{{ hour }}</option>
+            </select>
           </div>
         </div>
 
@@ -684,6 +681,7 @@ const commonNotificationTimezones = [
   'America/New_York',
   'America/Los_Angeles'
 ]
+const expireNotificationHourOptions = Array.from({ length: 24 }, (_, hour) => String(hour))
 
 const cspErrors = reactive({
   csp_static: '',

@@ -667,9 +667,11 @@ const normalizeNotificationTimezoneSetting = (value) => {
 }
 
 const normalizeExpireNotificationTimeSetting = (value) => {
-  const time = String(value || '').trim()
-  const match = time.match(/^([01]\d|2[0-3])(?::[0-5]\d)?$/)
-  return match ? `${match[1]}:00` : '12:00'
+  const raw = String(value ?? '').trim()
+  if (!raw) return '12'
+  const legacyTimeMatch = raw.match(/^([01]?\d|2[0-3]):[0-5]\d$/)
+  const hour = Number(legacyTimeMatch ? legacyTimeMatch[1] : raw)
+  return Number.isInteger(hour) && hour >= 0 && hour <= 23 ? String(hour) : '12'
 }
 
 const normalizeLongHistoryPointsSetting = (value) => {
@@ -901,7 +903,7 @@ const settings = ref({
   tg_bot_token: '',
   tg_chat_id: '',
   notification_timezone: 'UTC',
-  expire_notification_time: '12:00',
+  expire_notification_time: '12',
   notification_webhook_enabled: false,
   notification_webhook_url: '',
   notification_webhook_method: 'POST',
@@ -1399,8 +1401,8 @@ const saveSettings = async () => {
     return
   }
 
-  if (normalizeExpireNotificationTimeSetting(settings.value.expire_notification_time) !== settings.value.expire_notification_time) {
-    validationError.value = trans.value.invalidExpireNotificationTime || 'Expiration notification time must use an hourly HH:00 value'
+  if (normalizeExpireNotificationTimeSetting(settings.value.expire_notification_time) !== String(settings.value.expire_notification_time)) {
+    validationError.value = trans.value.invalidExpireNotificationTime || 'Expiration notification time must be an integer from 0 to 23'
     return
   }
 

@@ -14,7 +14,7 @@ export const LONG_HISTORY_POINT_OPTIONS = [60, 120, 180, 240];
 export const DEFAULT_LONG_HISTORY_POINTS = 120;
 export const FRONTEND_WS_TIMEOUT_MINUTES_MAX = 1440;
 export const DEFAULT_NOTIFICATION_TIMEZONE = 'UTC';
-export const DEFAULT_EXPIRE_NOTIFICATION_TIME = '12:00';
+export const DEFAULT_EXPIRE_NOTIFICATION_TIME = '12';
 export const ALL_WSS_REPORT_HOURS = Object.freeze(Array.from({ length: 24 }, (_, hour) => hour));
 export const RESOURCE_ALERT_WINDOW_MIN = 5;
 export const RESOURCE_ALERT_WINDOW_MAX = 10;
@@ -186,9 +186,13 @@ export function normalizeNotificationTimezone(value) {
 }
 
 export function normalizeExpireNotificationTime(value) {
-  const time = String(value || '').trim();
-  const match = time.match(/^([01]\d|2[0-3])(?::[0-5]\d)?$/);
-  return match ? `${match[1]}:00` : DEFAULT_EXPIRE_NOTIFICATION_TIME;
+  const raw = String(value ?? '').trim();
+  if (!raw) return DEFAULT_EXPIRE_NOTIFICATION_TIME;
+  const legacyTimeMatch = raw.match(/^([01]?\d|2[0-3]):[0-5]\d$/);
+  const hour = Number(legacyTimeMatch ? legacyTimeMatch[1] : raw);
+  return Number.isInteger(hour) && hour >= 0 && hour <= 23
+    ? String(hour)
+    : DEFAULT_EXPIRE_NOTIFICATION_TIME;
 }
 
 export function normalizeNotificationWebhookMethod(value) {
