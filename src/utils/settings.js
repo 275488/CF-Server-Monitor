@@ -1,4 +1,4 @@
-const CURRENT_VERSION = '2.8.4 Beta6';
+const CURRENT_VERSION = '2.8.4 Beta7';
 export const DEFAULT_SITE_TITLE = 'Cloudflare Server Monitor';
 export const APPEARANCE_FIELDS = ['site_title', 'custom_bg', 'favicon', 'custom_head', 'custom_script', 'csp_static', 'csp_api', 'display_mode', 'theme_options'];
 
@@ -453,11 +453,49 @@ export function isWssReportConfigured(settings = {}) {
   return normalizeBooleanSetting(settings?.wss_report_enabled) === 'true';
 }
 
-export function isWssReportEnabled(settings = {}, now = Date.now()) {
-  if (!isWssReportConfigured(settings)) return false;
+export function getWssReportScheduleState(settings = {}, now = Date.now()) {
   const date = now instanceof Date ? now : new Date(now);
-  if (Number.isNaN(date.getTime())) return false;
-  return normalizeWssReportHours(settings?.wss_report_hours).includes(date.getUTCHours());
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date;
+
+  if (!isWssReportConfigured(settings)) {
+    return {
+      configured: false,
+      active: false,
+      mode: 'disabled',
+      reason: 'wss_disabled'
+    };
+  }
+
+  const hours = normalizeWssReportHours(settings?.wss_report_hours);
+  if (hours.length === 0) {
+    return {
+      configured: true,
+      active: false,
+      mode: 'inactive',
+      reason: 'wss_schedule_empty'
+    };
+  }
+
+  const currentHour = safeDate.getUTCHours();
+  if (hours.includes(currentHour)) {
+    return {
+      configured: true,
+      active: true,
+      mode: 'active',
+      reason: 'wss_schedule_active'
+    };
+  }
+
+  return {
+    configured: true,
+    active: false,
+    mode: 'inactive',
+    reason: 'wss_schedule_inactive'
+  };
+}
+
+export function isWssReportEnabled(settings = {}, now = Date.now()) {
+  return getWssReportScheduleState(settings, now).active;
 }
 
 function hasMissingFields(source, fields) {

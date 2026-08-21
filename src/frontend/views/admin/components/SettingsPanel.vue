@@ -143,7 +143,7 @@
                 <HelpTooltip :text="trans.wssReportHoursTip" />
               </div>
               <div class="wss-schedule-meta">
-                {{ localTimezoneLabel }} · {{ wssReportHours.length }}/24 {{ trans.hoursSelected }}
+                {{ localTimezoneLabel }} · {{ wssReportHours.length }}/24 {{ trans.hoursSelected }} · {{ trans.agentWssMinVersion }}
               </div>
             </div>
             <div class="wss-schedule-actions">
